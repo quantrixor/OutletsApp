@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="9ef76996a2db432d979cfe440ecea4d9" Name="Diagram1">
+        <EntityTypeShape EntityType="dbТорговыеТочкиModel.Магазины" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="dbТорговыеТочкиModel.Номенклатура" Width="1.5" PointX="5.25" PointY="1.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="dbТорговыеТочкиModel.Специализации" Width="1.5" PointX="0.75" PointY="1.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="dbТорговыеТочкиModel.ФормыСобственности" Width="1.5" PointX="0.75" PointY="5.625" IsExpanded="true" />
+        <AssociationConnector Association="dbТорговыеТочкиModel.FK__Магазины__Специа__3B75D760" ManuallyRouted="false" />
+        <AssociationConnector Association="dbТорговыеТочкиModel.FK__Магазины__ФормаС__3C69FB99" ManuallyRouted="false" />
+        <AssociationConnector Association="dbТорговыеТочкиModel.FK__Номенклат__Магаз__3F466844" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
