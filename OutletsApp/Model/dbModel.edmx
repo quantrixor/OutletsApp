@@ -4,7 +4,14 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="Хранилище dbТорговыеТочкиModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="Хранилище dbТорговыеТочкиModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Категории">
+          <Key>
+            <PropertyRef Name="КатегорияID" />
+          </Key>
+          <Property Name="КатегорияID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Описание" Type="nvarchar" MaxLength="100" Nullable="false" />
+        </EntityType>
         <EntityType Name="Магазины">
           <Key>
             <PropertyRef Name="МагазинID" />
@@ -24,7 +31,7 @@
           <Property Name="НоменклатураID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="МагазинID" Type="int" Nullable="false" />
           <Property Name="НаименованиеТовара" Type="nvarchar" MaxLength="100" Nullable="false" />
-          <Property Name="Категория" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="КатегорияID" Type="int" Nullable="false" />
           <Property Name="Цена" Type="decimal" Precision="10" Scale="2" Nullable="false" />
         </EntityType>
         <EntityType Name="Специализации">
@@ -65,7 +72,19 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Номенклат__Магаз__3F466844">
+        <Association Name="FK__Номенклат__Катег__4F7CD00D">
+          <End Role="Категории" Type="Self.Категории" Multiplicity="1" />
+          <End Role="Номенклатура" Type="Self.Номенклатура" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Категории">
+              <PropertyRef Name="КатегорияID" />
+            </Principal>
+            <Dependent Role="Номенклатура">
+              <PropertyRef Name="КатегорияID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Номенклат__Магаз__4E88ABD4">
           <End Role="Магазины" Type="Self.Магазины" Multiplicity="1" />
           <End Role="Номенклатура" Type="Self.Номенклатура" Multiplicity="*" />
           <ReferentialConstraint>
@@ -78,6 +97,7 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="Хранилище dbТорговыеТочкиModelContainer">
+          <EntitySet Name="Категории" EntityType="Self.Категории" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Магазины" EntityType="Self.Магазины" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Номенклатура" EntityType="Self.Номенклатура" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Специализации" EntityType="Self.Специализации" Schema="dbo" store:Type="Tables" />
@@ -90,30 +110,64 @@
             <End Role="ФормыСобственности" EntitySet="ФормыСобственности" />
             <End Role="Магазины" EntitySet="Магазины" />
           </AssociationSet>
-          <AssociationSet Name="FK__Номенклат__Магаз__3F466844" Association="Self.FK__Номенклат__Магаз__3F466844">
+          <AssociationSet Name="FK__Номенклат__Катег__4F7CD00D" Association="Self.FK__Номенклат__Катег__4F7CD00D">
+            <End Role="Категории" EntitySet="Категории" />
+            <End Role="Номенклатура" EntitySet="Номенклатура" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Номенклат__Магаз__4E88ABD4" Association="Self.FK__Номенклат__Магаз__4E88ABD4">
             <End Role="Магазины" EntitySet="Магазины" />
             <End Role="Номенклатура" EntitySet="Номенклатура" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="dbТорговыеТочкиModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="dbТорговыеТочкиEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Категории" EntityType="dbТорговыеТочкиModel.Категории" />
+          <EntitySet Name="Магазины" EntityType="dbТорговыеТочкиModel.Магазины" />
+          <EntitySet Name="Номенклатура" EntityType="dbТорговыеТочкиModel.Номенклатура" />
+          <EntitySet Name="Специализации" EntityType="dbТорговыеТочкиModel.Специализации" />
+          <EntitySet Name="ФормыСобственности" EntityType="dbТорговыеТочкиModel.ФормыСобственности" />
+          <AssociationSet Name="FK__Номенклат__Катег__4F7CD00D" Association="dbТорговыеТочкиModel.FK__Номенклат__Катег__4F7CD00D">
+            <End Role="Категории" EntitySet="Категории" />
+            <End Role="Номенклатура" EntitySet="Номенклатура" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Магазины__Специа__3B75D760" Association="dbТорговыеТочкиModel.FK__Магазины__Специа__3B75D760">
+            <End Role="Специализации" EntitySet="Специализации" />
+            <End Role="Магазины" EntitySet="Магазины" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Магазины__ФормаС__3C69FB99" Association="dbТорговыеТочкиModel.FK__Магазины__ФормаС__3C69FB99">
+            <End Role="ФормыСобственности" EntitySet="ФормыСобственности" />
+            <End Role="Магазины" EntitySet="Магазины" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Номенклат__Магаз__4E88ABD4" Association="dbТорговыеТочкиModel.FK__Номенклат__Магаз__4E88ABD4">
+            <End Role="Магазины" EntitySet="Магазины" />
+            <End Role="Номенклатура" EntitySet="Номенклатура" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Категории">
+          <Key>
+            <PropertyRef Name="КатегорияID" />
+          </Key>
+          <Property Name="КатегорияID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Описание" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Номенклатура" Relationship="dbТорговыеТочкиModel.FK__Номенклат__Катег__4F7CD00D" FromRole="Категории" ToRole="Номенклатура" />
+        </EntityType>
         <EntityType Name="Магазины">
           <Key>
             <PropertyRef Name="МагазинID" />
           </Key>
           <Property Name="МагазинID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Название" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Адрес" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Телефоны" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Название" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Адрес" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Телефоны" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
           <Property Name="СпециализацияID" Type="Int32" Nullable="false" />
           <Property Name="ФормаСобственностиID" Type="Int32" Nullable="false" />
-          <Property Name="ВремяРаботы" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Специализации" Relationship="Self.FK__Магазины__Специа__3B75D760" FromRole="Магазины" ToRole="Специализации" />
-          <NavigationProperty Name="ФормыСобственности" Relationship="Self.FK__Магазины__ФормаС__3C69FB99" FromRole="Магазины" ToRole="ФормыСобственности" />
-          <NavigationProperty Name="Номенклатура" Relationship="Self.FK__Номенклат__Магаз__3F466844" FromRole="Магазины" ToRole="Номенклатура" />
+          <Property Name="ВремяРаботы" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Специализации" Relationship="dbТорговыеТочкиModel.FK__Магазины__Специа__3B75D760" FromRole="Магазины" ToRole="Специализации" />
+          <NavigationProperty Name="ФормыСобственности" Relationship="dbТорговыеТочкиModel.FK__Магазины__ФормаС__3C69FB99" FromRole="Магазины" ToRole="ФормыСобственности" />
+          <NavigationProperty Name="Номенклатура" Relationship="dbТорговыеТочкиModel.FK__Номенклат__Магаз__4E88ABD4" FromRole="Магазины" ToRole="Номенклатура" />
         </EntityType>
         <EntityType Name="Номенклатура">
           <Key>
@@ -121,30 +175,43 @@
           </Key>
           <Property Name="НоменклатураID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="МагазинID" Type="Int32" Nullable="false" />
-          <Property Name="НаименованиеТовара" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Категория" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Цена" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
-          <NavigationProperty Name="Магазины" Relationship="Self.FK__Номенклат__Магаз__3F466844" FromRole="Номенклатура" ToRole="Магазины" />
+          <Property Name="НаименованиеТовара" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="КатегорияID" Type="Int32" Nullable="false" />
+          <Property Name="Цена" Type="Decimal" Nullable="false" Precision="10" Scale="2" />
+          <NavigationProperty Name="Категории" Relationship="dbТорговыеТочкиModel.FK__Номенклат__Катег__4F7CD00D" FromRole="Номенклатура" ToRole="Категории" />
+          <NavigationProperty Name="Магазины" Relationship="dbТорговыеТочкиModel.FK__Номенклат__Магаз__4E88ABD4" FromRole="Номенклатура" ToRole="Магазины" />
         </EntityType>
         <EntityType Name="Специализации">
           <Key>
             <PropertyRef Name="СпециализацияID" />
           </Key>
           <Property Name="СпециализацияID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Описание" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Магазины" Relationship="Self.FK__Магазины__Специа__3B75D760" FromRole="Специализации" ToRole="Магазины" />
+          <Property Name="Описание" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Магазины" Relationship="dbТорговыеТочкиModel.FK__Магазины__Специа__3B75D760" FromRole="Специализации" ToRole="Магазины" />
         </EntityType>
         <EntityType Name="ФормыСобственности">
           <Key>
             <PropertyRef Name="ФормаСобственностиID" />
           </Key>
           <Property Name="ФормаСобственностиID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Описание" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Магазины" Relationship="Self.FK__Магазины__ФормаС__3C69FB99" FromRole="ФормыСобственности" ToRole="Магазины" />
+          <Property Name="Описание" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Магазины" Relationship="dbТорговыеТочкиModel.FK__Магазины__ФормаС__3C69FB99" FromRole="ФормыСобственности" ToRole="Магазины" />
         </EntityType>
+        <Association Name="FK__Номенклат__Катег__4F7CD00D">
+          <End Type="dbТорговыеТочкиModel.Категории" Role="Категории" Multiplicity="1" />
+          <End Type="dbТорговыеТочкиModel.Номенклатура" Role="Номенклатура" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Категории">
+              <PropertyRef Name="КатегорияID" />
+            </Principal>
+            <Dependent Role="Номенклатура">
+              <PropertyRef Name="КатегорияID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK__Магазины__Специа__3B75D760">
-          <End Role="Специализации" Type="Self.Специализации" Multiplicity="1" />
-          <End Role="Магазины" Type="Self.Магазины" Multiplicity="*" />
+          <End Type="dbТорговыеТочкиModel.Специализации" Role="Специализации" Multiplicity="1" />
+          <End Type="dbТорговыеТочкиModel.Магазины" Role="Магазины" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Специализации">
               <PropertyRef Name="СпециализацияID" />
@@ -155,8 +222,8 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Магазины__ФормаС__3C69FB99">
-          <End Role="ФормыСобственности" Type="Self.ФормыСобственности" Multiplicity="1" />
-          <End Role="Магазины" Type="Self.Магазины" Multiplicity="*" />
+          <End Type="dbТорговыеТочкиModel.ФормыСобственности" Role="ФормыСобственности" Multiplicity="1" />
+          <End Type="dbТорговыеТочкиModel.Магазины" Role="Магазины" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="ФормыСобственности">
               <PropertyRef Name="ФормаСобственностиID" />
@@ -166,9 +233,9 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Номенклат__Магаз__3F466844">
-          <End Role="Магазины" Type="Self.Магазины" Multiplicity="1" />
-          <End Role="Номенклатура" Type="Self.Номенклатура" Multiplicity="*" />
+        <Association Name="FK__Номенклат__Магаз__4E88ABD4">
+          <End Type="dbТорговыеТочкиModel.Магазины" Role="Магазины" Multiplicity="1" />
+          <End Type="dbТорговыеТочкиModel.Номенклатура" Role="Номенклатура" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Магазины">
               <PropertyRef Name="МагазинID" />
@@ -178,67 +245,57 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="dbТорговыеТочкиEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Магазины" EntityType="Self.Магазины" />
-          <EntitySet Name="Номенклатура" EntityType="Self.Номенклатура" />
-          <EntitySet Name="Специализации" EntityType="Self.Специализации" />
-          <EntitySet Name="ФормыСобственности" EntityType="Self.ФормыСобственности" />
-          <AssociationSet Name="FK__Магазины__Специа__3B75D760" Association="Self.FK__Магазины__Специа__3B75D760">
-            <End Role="Специализации" EntitySet="Специализации" />
-            <End Role="Магазины" EntitySet="Магазины" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Магазины__ФормаС__3C69FB99" Association="Self.FK__Магазины__ФормаС__3C69FB99">
-            <End Role="ФормыСобственности" EntitySet="ФормыСобственности" />
-            <End Role="Магазины" EntitySet="Магазины" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Номенклат__Магаз__3F466844" Association="Self.FK__Номенклат__Магаз__3F466844">
-            <End Role="Магазины" EntitySet="Магазины" />
-            <End Role="Номенклатура" EntitySet="Номенклатура" />
-          </AssociationSet>
-        </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="Хранилище dbТорговыеТочкиModelContainer" CdmEntityContainer="dbТорговыеТочкиEntities">
+          <EntitySetMapping Name="Категории">
+            <EntityTypeMapping TypeName="dbТорговыеТочкиModel.Категории">
+              <MappingFragment StoreEntitySet="Категории">
+                <ScalarProperty Name="Описание" ColumnName="Описание" />
+                <ScalarProperty Name="КатегорияID" ColumnName="КатегорияID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Магазины">
             <EntityTypeMapping TypeName="dbТорговыеТочкиModel.Магазины">
               <MappingFragment StoreEntitySet="Магазины">
-                <ScalarProperty Name="МагазинID" ColumnName="МагазинID" />
-                <ScalarProperty Name="Название" ColumnName="Название" />
-                <ScalarProperty Name="Адрес" ColumnName="Адрес" />
-                <ScalarProperty Name="Телефоны" ColumnName="Телефоны" />
-                <ScalarProperty Name="СпециализацияID" ColumnName="СпециализацияID" />
-                <ScalarProperty Name="ФормаСобственностиID" ColumnName="ФормаСобственностиID" />
                 <ScalarProperty Name="ВремяРаботы" ColumnName="ВремяРаботы" />
+                <ScalarProperty Name="ФормаСобственностиID" ColumnName="ФормаСобственностиID" />
+                <ScalarProperty Name="СпециализацияID" ColumnName="СпециализацияID" />
+                <ScalarProperty Name="Телефоны" ColumnName="Телефоны" />
+                <ScalarProperty Name="Адрес" ColumnName="Адрес" />
+                <ScalarProperty Name="Название" ColumnName="Название" />
+                <ScalarProperty Name="МагазинID" ColumnName="МагазинID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Номенклатура">
             <EntityTypeMapping TypeName="dbТорговыеТочкиModel.Номенклатура">
               <MappingFragment StoreEntitySet="Номенклатура">
-                <ScalarProperty Name="НоменклатураID" ColumnName="НоменклатураID" />
-                <ScalarProperty Name="МагазинID" ColumnName="МагазинID" />
-                <ScalarProperty Name="НаименованиеТовара" ColumnName="НаименованиеТовара" />
-                <ScalarProperty Name="Категория" ColumnName="Категория" />
                 <ScalarProperty Name="Цена" ColumnName="Цена" />
+                <ScalarProperty Name="КатегорияID" ColumnName="КатегорияID" />
+                <ScalarProperty Name="НаименованиеТовара" ColumnName="НаименованиеТовара" />
+                <ScalarProperty Name="МагазинID" ColumnName="МагазинID" />
+                <ScalarProperty Name="НоменклатураID" ColumnName="НоменклатураID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Специализации">
             <EntityTypeMapping TypeName="dbТорговыеТочкиModel.Специализации">
               <MappingFragment StoreEntitySet="Специализации">
-                <ScalarProperty Name="СпециализацияID" ColumnName="СпециализацияID" />
                 <ScalarProperty Name="Описание" ColumnName="Описание" />
+                <ScalarProperty Name="СпециализацияID" ColumnName="СпециализацияID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="ФормыСобственности">
             <EntityTypeMapping TypeName="dbТорговыеТочкиModel.ФормыСобственности">
               <MappingFragment StoreEntitySet="ФормыСобственности">
-                <ScalarProperty Name="ФормаСобственностиID" ColumnName="ФормаСобственностиID" />
                 <ScalarProperty Name="Описание" ColumnName="Описание" />
+                <ScalarProperty Name="ФормаСобственностиID" ColumnName="ФормаСобственностиID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

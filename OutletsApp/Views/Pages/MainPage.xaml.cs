@@ -19,21 +19,43 @@ namespace OutletsApp.Views.Pages
             InitializeComponent();
 
         }
-
+        // Переход в окно добавления данных
         private void AddProduct_Click(object sender, RoutedEventArgs e)
         {
-
+            NavigationService.Navigate(new ManageNomenclaturePage(new Номенклатура()));
         }
 
         private void DeleteProduct_Click(object sender, RoutedEventArgs e)
         {
-
+            var selectedItem = ProductsDataGrid.SelectedItems as Номенклатура;
         }
 
+        // Редактирование данных
         private void EditProduct_Click(object sender, RoutedEventArgs e)
         {
-
+            var selectedItem = ProductsDataGrid.SelectedItems as Номенклатура;
+            if (selectedItem != null)
+            {
+                NavigationService.Navigate(new ManageNomenclaturePage(selectedItem));
+            }
+            else
+            {
+                MessageBox.Show("Выберите запись из списка!", "Внимание! Не правильное действие", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
+
+        public void LoadInventoryData()
+        {
+            using (var db = new dbТорговыеТочкиEntities())
+            {
+                var inventoryQuery = db.Номенклатура
+                                       .Include("Магазины")
+                                       .Include("Категории").ToList();
+
+                ProductsDataGrid.ItemsSource = inventoryQuery;
+            }
+        }
+
 
         private void AddStore_Click(object sender, RoutedEventArgs e)
         {
@@ -98,19 +120,27 @@ namespace OutletsApp.Views.Pages
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             LoadDataStory();
+            LoadInventoryData();
         }
 
         // Загрзука магазинов
         private void LoadDataStory()
         {
-            using (var db = new dbТорговыеТочкиEntities())
+            try
             {
-                var stores = db.Магазины
-                       .Include("Специализации")
-                       .Include("ФормыСобственности")
-                       .ToList();
+                using (var db = new dbТорговыеТочкиEntities())
+                {
+                    var stores = db.Магазины
+                           .Include("Специализации")
+                           .Include("ФормыСобственности")
+                           .ToList();
 
-                StoresDataGrid.ItemsSource = stores;
+                    StoresDataGrid.ItemsSource = stores;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Произошла системная ошибка: " + ex.Message, "Внимание, сбой!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

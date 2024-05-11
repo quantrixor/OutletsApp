@@ -17,9 +17,10 @@ namespace OutletsApp.Model
         public int НоменклатураID { get; set; }
         public int МагазинID { get; set; }
         public string НаименованиеТовара { get; set; }
-        public string Категория { get; set; }
+        public int КатегорияID { get; set; }
         public decimal Цена { get; set; }
     
+        public virtual Категории Категории { get; set; }
         public virtual Магазины Магазины { get; set; }
     }
 }

@@ -79,6 +79,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>dbModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Model\Категории.cs">
+      <DependentUpon>dbModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Model\МагазинDTO.cs" />
     <Compile Include="Model\Магазины.cs">
       <DependentUpon>dbModel.tt</DependentUpon>
@@ -97,6 +100,9 @@
     <Compile Include="Views\Pages\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Pages\ManageNomenclaturePage.xaml.cs">
+      <DependentUpon>ManageNomenclaturePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Pages\ManageStoryPage.xaml.cs">
       <DependentUpon>ManageStoryPage.xaml</DependentUpon>
     </Compile>
@@ -113,6 +119,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\Pages\MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Pages\ManageNomenclaturePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

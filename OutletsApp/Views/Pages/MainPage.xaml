@@ -50,9 +50,9 @@
                     </Grid.RowDefinitions>
                     <DataGrid x:Name="ProductsDataGrid" ColumnWidth="*" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" Margin="5">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Магазин" Binding="{Binding Магазин.Название}"/>
+                            <DataGridTextColumn Header="Магазин" Binding="{Binding Магазины.Название}"/>
                             <DataGridTextColumn Header="Наименование товара" Binding="{Binding НаименованиеТовара}"/>
-                            <DataGridTextColumn Header="Категория" Binding="{Binding Категория}"/>
+                            <DataGridTextColumn Header="Категория" Binding="{Binding Категории.Описание}"/>
                             <DataGridTextColumn Header="Цена" Binding="{Binding Цена}"/>
                         </DataGrid.Columns>
                     </DataGrid>

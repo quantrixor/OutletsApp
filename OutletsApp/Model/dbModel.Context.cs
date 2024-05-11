@@ -25,6 +25,7 @@ namespace OutletsApp.Model
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<Категории> Категории { get; set; }
         public virtual DbSet<Магазины> Магазины { get; set; }
         public virtual DbSet<Номенклатура> Номенклатура { get; set; }
         public virtual DbSet<Специализации> Специализации { get; set; }
