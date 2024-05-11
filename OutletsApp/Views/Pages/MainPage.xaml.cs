@@ -1,5 +1,6 @@
 ﻿using OutletsApp.Model;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
 using System.Windows;
@@ -71,12 +72,15 @@ namespace OutletsApp.Views.Pages
             {
                 using (var db = new dbТорговыеТочкиEntities())
                 {
+                    // Выбираем конкретный объект, который необходимо удалить из списка
                     var itemToDelete = db.Магазины.Find(selectedItem.МагазинID);
                     if (itemToDelete != null)
                     {
+                        // Отправляем запрос на удаление данных
                         db.Магазины.Remove(itemToDelete);
                         await db.SaveChangesAsync();
                         MessageBox.Show("Вы успешно удалили выбранную запись.", "Операция прошла успешно", MessageBoxButton.OK, MessageBoxImage.Information);
+                        // Обновляем список
                         LoadDataStory();
                     }
                     else
@@ -89,11 +93,6 @@ namespace OutletsApp.Views.Pages
             {
                 MessageBox.Show("Произошла системная ошибка!" + ex.Message, "Внимание, сбой.", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-
-        private void StoresDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -114,5 +113,53 @@ namespace OutletsApp.Views.Pages
                 StoresDataGrid.ItemsSource = stores;
             }
         }
+
+        public List<МагазинDTO> SearchStores(string searchText)
+        {
+            using (var db = new dbТорговыеТочкиEntities())
+            {
+                var query = from m in db.Магазины
+                            join s in db.Специализации on m.СпециализацияID equals s.СпециализацияID
+                            join f in db.ФормыСобственности on m.ФормаСобственностиID equals f.ФормаСобственностиID
+                            where m.Название.Contains(searchText) ||
+                                  m.Адрес.Contains(searchText) ||
+                                  m.Телефоны.Contains(searchText) ||
+                                  m.ВремяРаботы.Contains(searchText) ||
+                                  s.Описание.Contains(searchText) ||
+                                  f.Описание.Contains(searchText)
+                            select new
+                            {
+                                m.МагазинID,
+                                m.Название,
+                                m.Адрес,
+                                m.Телефоны,
+                                m.ВремяРаботы,
+                                СпециализацияОписание = s.Описание,
+                                ФормаСобственностьОписание = f.Описание
+                            };
+
+                var result = query.AsEnumerable().Select(x => new МагазинDTO
+                {
+                    МагазинID = x.МагазинID,
+                    Название = x.Название,
+                    Адрес = x.Адрес,
+                    Телефоны = x.Телефоны,
+                    ВремяРаботы = x.ВремяРаботы,
+                    СпециализацияОписание = x.СпециализацияОписание,
+                    ФормаСобственностьОписание = x.ФормаСобственностьОписание
+                }).ToList();
+
+                return result;
+            }
+        }
+
+
+        private void btnSearch_Click(object sender, RoutedEventArgs e)
+        {
+            StoresDataGrid.ItemsSource = SearchStores(SearchBox.Text);
+        }
+
+        // Алгоритм нечетного поиска по мере ввода данных
+
     }
 }

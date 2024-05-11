@@ -20,9 +20,10 @@
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <TextBlock Text="Поиск:" Margin="0,0,10,0"/>
-                        <TextBox x:Name="SearchBox" Width="200"/>
+                        <TextBox x:Name="SearchBox" Width="250" />
+                        <Button Content="Искать" Margin="5,0,0,0" Width="100" x:Name="btnSearch" Click="btnSearch_Click"/>
                     </StackPanel>
-                    <DataGrid x:Name="StoresDataGrid" Grid.Row="1" ColumnWidth="*" SelectionChanged="StoresDataGrid_SelectionChanged" AutoGenerateColumns="False" CanUserAddRows="False" Margin="5">
+                    <DataGrid x:Name="StoresDataGrid" Grid.Row="1" ColumnWidth="*" AutoGenerateColumns="False" CanUserAddRows="False" Margin="5">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Название" Binding="{Binding Название}"/>
                             <DataGridTextColumn Header="Адрес" Binding="{Binding Адрес}"/>

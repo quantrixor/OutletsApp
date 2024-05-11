@@ -27,7 +27,7 @@ namespace OutletsApp.Model
         public int СпециализацияID { get; set; }
         public int ФормаСобственностиID { get; set; }
         public string ВремяРаботы { get; set; }
-    
+
         public virtual Специализации Специализации { get; set; }
         public virtual ФормыСобственности ФормыСобственности { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

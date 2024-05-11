@@ -79,6 +79,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>dbModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Model\МагазинDTO.cs" />
     <Compile Include="Model\Магазины.cs">
       <DependentUpon>dbModel.tt</DependentUpon>
     </Compile>
