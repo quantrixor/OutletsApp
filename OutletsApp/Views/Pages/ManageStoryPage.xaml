@@ -5,7 +5,6 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:OutletsApp.Views.Pages"
       mc:Ignorable="d" FontSize="14"
-      Loaded="Page_Loaded"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="ManageStoryPage">
 
@@ -16,13 +15,14 @@
             <Label Content="Адрес:"/>
             <TextBox Height="50" TextWrapping="Wrap" x:Name="txbAddress"/>
             <Label Content="Телефон:"/>
-            <TextBox x:Name="txbPhoneNumber"/>
+            <TextBox x:Name="txbPhoneNumber" PreviewTextInput="txbPhoneNumber_PreviewTextInput"/>
             <Label Content="Спецаилизация:"/>
             <ComboBox x:Name="SpecializationComboBox" DisplayMemberPath="Описание" SelectedValuePath="СпециализацияID"/>
             <Label Content="Форма собственности:"/>
             <ComboBox x:Name="OwnershipComboBox" DisplayMemberPath="Описание" SelectedValuePath="ФормаСобственностиID"/>
             <Label Content="Время работы:"/>
-            <TextBox x:Name="txbTimeWorking"/>
+            <TextBox x:Name="txbTimeWorking" PreviewTextInput="TimeTextBox_PreviewTextInput" TextChanged="txbTimeWorking_TextChanged" />
+
             <Button Content="Сохранить" x:Name="btnSave" Click="btnSave_Click" Margin="0,5,0,5"/>
             <Button Content="Назад" x:Name="btnBack" Click="btnBack_Click"/>
         </StackPanel>

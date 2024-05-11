@@ -55,24 +55,34 @@ namespace OutletsApp.Views.Pages
         // Удаление выбранного магазина
         private async void DeleteStore_Click(object sender, RoutedEventArgs e)
         {
+            if (MessageBox.Show("Вы действительно хотите удалить выбранный объект магазина? Данные будут удалены без возможности восстановления.", "Внимание, подтвердите действие", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+            {
+                return;
+            }
+
+            var selectedItem = StoresDataGrid.SelectedItem as Магазины;
+            if (selectedItem == null)
+            {
+                MessageBox.Show("Выберите магазин для удаления.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             try
             {
-                if (MessageBox.Show("Вы действительно хотите удалить выбранный объект магазина? Данные будут удалены без возможности восстановления.", "Внимание, подтвердите действие", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
+                using (var db = new dbТорговыеТочкиEntities())
                 {
-                    return;
-                }
-
-                // Процедура выбора объекта магазина
-                var selectedItem = StoresDataGrid.SelectedItem as Магазины;
-                if (selectedItem != null)
-                {
-                    using (var db = new dbТорговыеТочкиEntities())
+                    var itemToDelete = db.Магазины.Find(selectedItem.МагазинID);
+                    if (itemToDelete != null)
                     {
-                        db.Магазины.Remove(selectedItem);
+                        db.Магазины.Remove(itemToDelete);
                         await db.SaveChangesAsync();
+                        MessageBox.Show("Вы успешно удалили выбранную запись.", "Операция прошла успешно", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadDataStory();
                     }
-
-                    MessageBox.Show("Вы успешно удалили выбранную запись.", "Операция прошла успешно", MessageBoxButton.OK, MessageBoxImage.Information);
+                    else
+                    {
+                        MessageBox.Show("Не найден объект для удаления.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
             catch (Exception ex)

@@ -2,6 +2,7 @@
 using OutletsApp.ViewModel;
 using System;
 using System.Data.Entity;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -39,9 +40,10 @@ namespace OutletsApp.Views.Pages
                         db.Entry(_store).State = EntityState.Modified; // Явно указываем, что объект изменился
                     }
 
-                    if(txbName.Text == "" && txbAddress.Text == "" && txbPhoneNumber.Text == "" && txbTimeWorking.Text == "")
+                    if(txbName.Text == "" || txbAddress.Text == "" || txbPhoneNumber.Text == "" || txbTimeWorking.Text == "")
                     {
                         MessageBox.Show("Заполните поля, все поля являются обязательными к заполнению!", "Пустые значения недопустимы!", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
                     }
 
 
@@ -57,6 +59,7 @@ namespace OutletsApp.Views.Pages
                     else
                     {
                         MessageBox.Show("Выберите специализацию из списка!", "Внимание! Недопустимое значение", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
                     }
 
                     if (OwnershipComboBox.SelectedItem != null)
@@ -66,6 +69,7 @@ namespace OutletsApp.Views.Pages
                     else
                     {
                         MessageBox.Show("Выберите форму собственности из списка!", "Внимание! Недопустимое значение", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
                     }
 
                     _store.ВремяРаботы = txbTimeWorking.Text;
@@ -111,8 +115,78 @@ namespace OutletsApp.Views.Pages
             NavigationService.GoBack();
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        // Накладываем маску ввода номер телефона
+        private void txbPhoneNumber_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
+            if (!char.IsDigit(e.Text, e.Text.Length - 1))
+            {
+                e.Handled = true;
+                return;
+            }
+
+            TextBox textBox = sender as TextBox;
+            string text = textBox.Text + e.Text;
+
+            if (text.Length == 1)
+            {
+                textBox.Text = "+7 (";
+                textBox.SelectionStart = textBox.Text.Length;
+            }
+            else if (text.Length == 8)
+            {
+                textBox.Text += ") ";
+                textBox.SelectionStart = textBox.Text.Length;
+            }
+            else if (text.Length == 13 || text.Length == 16)
+            {
+                textBox.Text += "-";
+                textBox.SelectionStart = textBox.Text.Length;
+            }
+
+            if (textBox.Text.Length >= 18)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void TimeTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            // Разрешаем ввод только чисел и двоеточия
+            e.Handled = !char.IsDigit(e.Text, e.Text.Length - 1) && e.Text != ":";
+        }
+
+       
+        private void txbTimeWorking_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            if (textBox == null) return;
+
+            int cursorPosition = textBox.SelectionStart;
+            string text = textBox.Text;
+            string newText = string.Empty;
+
+            foreach (char c in text)
+            {
+                // Принимаем только цифры и двоеточия
+                if (char.IsDigit(c) || c == ':' && !newText.Contains(":"))
+                {
+                    newText += c;
+                }
+            }
+
+            // Разбиение и проверка корректности времени
+            string[] parts = newText.Split(':');
+            if (parts.Length == 2)
+            {
+                if (int.TryParse(parts[0], out int hours) && hours > 23)
+                    parts[0] = "23"; // Корректировка часов
+                if (int.TryParse(parts[1], out int minutes) && minutes > 59)
+                    parts[1] = "59"; // Корректировка минут
+                newText = parts[0] + ":" + parts[1];
+            }
+
+            textBox.Text = newText;
+            textBox.SelectionStart = cursorPosition > textBox.Text.Length ? textBox.Text.Length : cursorPosition;
 
         }
     }
