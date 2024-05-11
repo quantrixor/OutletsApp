@@ -25,9 +25,43 @@ namespace OutletsApp.Views.Pages
             NavigationService.Navigate(new ManageNomenclaturePage(new Номенклатура()));
         }
 
-        private void DeleteProduct_Click(object sender, RoutedEventArgs e)
+        private async void DeleteProduct_Click(object sender, RoutedEventArgs e)
         {
+            if (MessageBox.Show("Вы действительно хотите удалить выбранный объект номенклатуры? Данные будут удалены без возможности восстановления.", "Внимание, подтвердите действие", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+            {
+                return;
+            }
+
             var selectedItem = ProductsDataGrid.SelectedItem as Номенклатура;
+            if (selectedItem == null)
+            {
+                MessageBox.Show("Выберите товар для удаления.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            try
+            {
+                using (var db = new dbТорговыеТочкиEntities())
+                {
+                    var itemToDelete = db.Номенклатура.Find(selectedItem.НоменклатураID);
+                    if (itemToDelete != null)
+                    {
+                        db.Номенклатура.Remove(itemToDelete);
+                        await db.SaveChangesAsync();
+                        MessageBox.Show("Вы успешно удалили выбранную запись.", "Операция прошла успешно", MessageBoxButton.OK, MessageBoxImage.Information);
+                        // Здесь вызовите метод для обновления данных на экране, например:
+                        LoadInventoryData();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Не найден объект для удаления.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Произошла системная ошибка: " + ex.Message, "Внимание, сбой.", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         // Редактирование данных
