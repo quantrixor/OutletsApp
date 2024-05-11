@@ -10,6 +10,6 @@ namespace OutletsApp.ViewModel
 {
     public static class NomenclatureViewModel
     {
-       
+
     }
 }

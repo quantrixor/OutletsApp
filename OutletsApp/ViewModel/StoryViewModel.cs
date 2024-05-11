@@ -11,22 +11,28 @@ namespace OutletsApp.ViewModel
     public static class StoryViewModel
     {
         // Загрузка данных специализации
-        public static void LoadSpecializations(ComboBox SpecializationComboBox)
+        public static void LoadSpecializations(ComboBox SpecializationComboBox, Action afterLoad)
         {
             using (var db = new dbТорговыеТочкиEntities())
             {
                 var specializations = db.Специализации.ToList();
                 SpecializationComboBox.ItemsSource = specializations;
+                SpecializationComboBox.DisplayMemberPath = "Описание";
+                SpecializationComboBox.SelectedValuePath = "СпециализацияID";
+                afterLoad?.Invoke();
             }
         }
 
         // Загрузка форм собственности из базы данных
-        public static void LoadOwnerships(ComboBox OwnershipComboBox)
+        public static void LoadOwnerships(ComboBox OwnershipComboBox, Action afterLoad)
         {
             using (var db = new dbТорговыеТочкиEntities())
             {
-                var ownerships = db.Номенклатура.ToList();
+                var ownerships = db.ФормыСобственности.ToList();
                 OwnershipComboBox.ItemsSource = ownerships;
+                OwnershipComboBox.DisplayMemberPath = "Описание";
+                OwnershipComboBox.SelectedValuePath = "ФормаСобственностиID";
+                afterLoad?.Invoke();
             }
         }
     }
