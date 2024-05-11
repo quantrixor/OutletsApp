@@ -27,13 +27,13 @@ namespace OutletsApp.Views.Pages
 
         private void DeleteProduct_Click(object sender, RoutedEventArgs e)
         {
-            var selectedItem = ProductsDataGrid.SelectedItems as Номенклатура;
+            var selectedItem = ProductsDataGrid.SelectedItem as Номенклатура;
         }
 
         // Редактирование данных
         private void EditProduct_Click(object sender, RoutedEventArgs e)
         {
-            var selectedItem = ProductsDataGrid.SelectedItems as Номенклатура;
+            var selectedItem = ProductsDataGrid.SelectedItem as Номенклатура;
             if (selectedItem != null)
             {
                 NavigationService.Navigate(new ManageNomenclaturePage(selectedItem));
