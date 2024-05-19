@@ -13,8 +13,11 @@ namespace OutletsApp.Model
         public string Адрес { get; set; }
         public string Телефоны { get; set; }
         public string ВремяРаботы { get; set; }
+        public int СпециализацияID { get; set; }
+        public int ФормаСобственностиID { get; set; }
         public string СпециализацияОписание { get; set; }
         public string ФормаСобственностьОписание { get; set; }
     }
+
 
 }

@@ -26,6 +26,8 @@ namespace OutletsApp.Model
         public string Телефоны { get; set; }
         public int СпециализацияID { get; set; }
         public int ФормаСобственностиID { get; set; }
+        public Специализации Специализация { get; set; } // Навигационное свойство
+        public ФормыСобственности ФормаСобственности { get; set; } // Навигационное свойство
         public string ВремяРаботы { get; set; }
     
         public virtual Специализации Специализации { get; set; }

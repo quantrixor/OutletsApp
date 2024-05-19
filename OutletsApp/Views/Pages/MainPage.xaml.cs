@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Contexts;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -17,14 +16,15 @@ namespace OutletsApp.Views.Pages
         public MainPage()
         {
             InitializeComponent();
-
         }
+
         // Переход в окно добавления данных
         private void AddProduct_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new ManageNomenclaturePage(new Номенклатура()));
         }
 
+        // Удаление товара из базы данных
         private async void DeleteProduct_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Вы действительно хотите удалить выбранный объект номенклатуры? Данные будут удалены без возможности восстановления.", "Внимание, подтвердите действие", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
@@ -49,7 +49,7 @@ namespace OutletsApp.Views.Pages
                         db.Номенклатура.Remove(itemToDelete);
                         await db.SaveChangesAsync();
                         MessageBox.Show("Вы успешно удалили выбранную запись.", "Операция прошла успешно", MessageBoxButton.OK, MessageBoxImage.Information);
-                        // Здесь вызовите метод для обновления данных на экране, например:
+                        // Обновляем данные на экране
                         LoadInventoryData();
                     }
                     else
@@ -64,7 +64,7 @@ namespace OutletsApp.Views.Pages
             }
         }
 
-        // Редактирование данных
+        // Переход в окно редактирования данных
         private void EditProduct_Click(object sender, RoutedEventArgs e)
         {
             var selectedItem = ProductsDataGrid.SelectedItem as Номенклатура;
@@ -74,38 +74,47 @@ namespace OutletsApp.Views.Pages
             }
             else
             {
-                MessageBox.Show("Выберите запись из списка!", "Внимание! Не правильное действие", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Выберите запись из списка!", "Внимание! Неправильное действие", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
+        // Загрузка данных номенклатуры
         public void LoadInventoryData()
         {
-            using (var db = new dbТорговыеТочкиEntities())
+            try
             {
-                var inventoryQuery = db.Номенклатура
-                                       .Include("Магазины")
-                                       .Include("Категории").ToList();
+                using (var db = new dbТорговыеТочкиEntities())
+                {
+                    var inventoryQuery = db.Номенклатура
+                                           .Include("Магазины")
+                                           .Include("Категории").ToList();
 
-                ProductsDataGrid.ItemsSource = inventoryQuery;
+                    ProductsDataGrid.ItemsSource = inventoryQuery;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Произошла ошибка при загрузке данных: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-
+        // Переход в окно добавления магазина
         private void AddStore_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new ManageStoryPage(new Model.Магазины()));
+            NavigationService.Navigate(new ManageStoryPage(new МагазинDTO()));
         }
 
+        // Переход в окно редактирования магазина
         private void EditStore_Click(object sender, RoutedEventArgs e)
         {
-            var selectedItem = StoresDataGrid.SelectedItem as Магазины;
+            var selectedItem = StoresDataGrid.SelectedItem as МагазинDTO;
             if (selectedItem != null)
             {
                 NavigationService.Navigate(new ManageStoryPage(selectedItem));
             }
             else
             {
-                MessageBox.Show("Выберите запись из списка!", "Внимание! Не правильное действие", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Выберите запись из списка!", "Внимание! Неправильное действие", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -136,7 +145,7 @@ namespace OutletsApp.Views.Pages
                         db.Магазины.Remove(itemToDelete);
                         await db.SaveChangesAsync();
                         MessageBox.Show("Вы успешно удалили выбранную запись.", "Операция прошла успешно", MessageBoxButton.OK, MessageBoxImage.Information);
-                        // Обновляем список
+                        // Обновляем список магазинов
                         LoadDataStory();
                     }
                     else
@@ -147,83 +156,184 @@ namespace OutletsApp.Views.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Произошла системная ошибка!" + ex.Message, "Внимание, сбой.", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Произошла системная ошибка: " + ex.Message, "Внимание, сбой.", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
+        // Загрузка данных при загрузке страницы
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadDataStory();
-            LoadInventoryData();
+            try
+            {
+                LoadDataStory();
+                LoadInventoryData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Произошла ошибка при загрузке данных: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        // Загрзука магазинов
-        private void LoadDataStory()
+        // Загрузка данных магазинов
+        public void LoadDataStory()
         {
             try
             {
                 using (var db = new dbТорговыеТочкиEntities())
                 {
-                    var stores = db.Магазины
-                           .Include("Специализации")
-                           .Include("ФормыСобственности")
-                           .ToList();
+                    var query = from m in db.Магазины
+                                join s in db.Специализации on m.СпециализацияID equals s.СпециализацияID
+                                join f in db.ФормыСобственности on m.ФормаСобственностиID equals f.ФормаСобственностиID
+                                select new МагазинDTO
+                                {
+                                    МагазинID = m.МагазинID,
+                                    Название = m.Название,
+                                    Адрес = m.Адрес,
+                                    Телефоны = m.Телефоны,
+                                    ВремяРаботы = m.ВремяРаботы,
+                                    СпециализацияОписание = s.Описание,
+                                    ФормаСобственностьОписание = f.Описание
+                                };
 
-                    StoresDataGrid.ItemsSource = stores;
+                    StoresDataGrid.ItemsSource = query.ToList();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Произошла системная ошибка: " + ex.Message, "Внимание, сбой!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Произошла ошибка при загрузке данных магазинов: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
+        // Поиск магазинов по общему тексту
         public List<МагазинDTO> SearchStores(string searchText)
         {
-            using (var db = new dbТорговыеТочкиEntities())
+            try
             {
-                var query = from m in db.Магазины
-                            join s in db.Специализации on m.СпециализацияID equals s.СпециализацияID
-                            join f in db.ФормыСобственности on m.ФормаСобственностиID equals f.ФормаСобственностиID
-                            where m.Название.Contains(searchText) ||
-                                  m.Адрес.Contains(searchText) ||
-                                  m.Телефоны.Contains(searchText) ||
-                                  m.ВремяРаботы.Contains(searchText) ||
-                                  s.Описание.Contains(searchText) ||
-                                  f.Описание.Contains(searchText)
-                            select new
-                            {
-                                m.МагазинID,
-                                m.Название,
-                                m.Адрес,
-                                m.Телефоны,
-                                m.ВремяРаботы,
-                                СпециализацияОписание = s.Описание,
-                                ФормаСобственностьОписание = f.Описание
-                            };
-
-                var result = query.AsEnumerable().Select(x => new МагазинDTO
+                using (var db = new dbТорговыеТочкиEntities())
                 {
-                    МагазинID = x.МагазинID,
-                    Название = x.Название,
-                    Адрес = x.Адрес,
-                    Телефоны = x.Телефоны,
-                    ВремяРаботы = x.ВремяРаботы,
-                    СпециализацияОписание = x.СпециализацияОписание,
-                    ФормаСобственностьОписание = x.ФормаСобственностьОписание
-                }).ToList();
+                    var query = from m in db.Магазины
+                                join s in db.Специализации on m.СпециализацияID equals s.СпециализацияID
+                                join f in db.ФормыСобственности on m.ФормаСобственностиID equals f.ФормаСобственностиID
+                                where m.Название.Contains(searchText) ||
+                                      m.Адрес.Contains(searchText) ||
+                                      m.Телефоны.Contains(searchText) ||
+                                      m.ВремяРаботы.Contains(searchText) ||
+                                      s.Описание.Contains(searchText) ||
+                                      f.Описание.Contains(searchText)
+                                select new
+                                {
+                                    m.МагазинID,
+                                    m.Название,
+                                    m.Адрес,
+                                    m.Телефоны,
+                                    m.ВремяРаботы,
+                                    СпециализацияОписание = s.Описание,
+                                    ФормаСобственностьОписание = f.Описание
+                                };
 
-                return result;
+                    var result = query.AsEnumerable().Select(x => new МагазинDTO
+                    {
+                        МагазинID = x.МагазинID,
+                        Название = x.Название,
+                        Адрес = x.Адрес,
+                        Телефоны = x.Телефоны,
+                        ВремяРаботы = x.ВремяРаботы,
+                        СпециализацияОписание = x.СпециализацияОписание,
+                        ФормаСобственностьОписание = x.ФормаСобственностьОписание
+                    }).ToList();
+
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Произошла ошибка при поиске магазинов: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return new List<МагазинDTO>();
             }
         }
 
-
-        private void btnSearch_Click(object sender, RoutedEventArgs e)
+        // Поиск магазинов по товарам
+        public List<МагазинDTO> SearchStoresByProduct(string searchText)
         {
-            StoresDataGrid.ItemsSource = SearchStores(SearchBox.Text);
+            try
+            {
+                using (var db = new dbТорговыеТочкиEntities())
+                {
+                    var query = from n in db.Номенклатура
+                                join m in db.Магазины on n.МагазинID equals m.МагазинID
+                                join s in db.Специализации on m.СпециализацияID equals s.СпециализацияID
+                                join f in db.ФормыСобственности on m.ФормаСобственностиID equals f.ФормаСобственностиID
+                                where n.НаименованиеТовара.Contains(searchText)
+                                select new
+                                {
+                                    m.МагазинID,
+                                    m.Название,
+                                    m.Адрес,
+                                    m.Телефоны,
+                                    m.ВремяРаботы,
+                                    СпециализацияОписание = s.Описание,
+                                    ФормаСобственностьОписание = f.Описание
+                                };
+
+                    var result = query.AsEnumerable().Select(x => new МагазинDTO
+                    {
+                        МагазинID = x.МагазинID,
+                        Название = x.Название,
+                        Адрес = x.Адрес,
+                        Телефоны = x.Телефоны,
+                        ВремяРаботы = x.ВремяРаботы,
+                        СпециализацияОписание = x.СпециализацияОписание,
+                        ФормаСобственностьОписание = x.ФормаСобственностьОписание
+                    }).ToList();
+
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Произошла ошибка при поиске магазинов по товару: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return new List<МагазинDTO>();
+            }
         }
 
-        // Алгоритм нечетного поиска по мере ввода данных
+        // Обработчик для кнопки поиска по тексту
+        private void btnSearch_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                StoresDataGrid.ItemsSource = SearchStores(SearchBox.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Произошла ошибка при выполнении поиска: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
+        // Обработчик для кнопки обновления данных
+        private void btnUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadDataStory();
+                SearchBox.Text = "";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Произошла ошибка при обновлении данных: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // Обработчик для кнопки поиска по товарам
+        private void btnSearchProduct_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                StoresDataGrid.ItemsSource = SearchStoresByProduct(SearchBox.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Произошла ошибка при выполнении поиска по товарам: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     }
 }

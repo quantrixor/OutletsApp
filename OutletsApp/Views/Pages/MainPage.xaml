@@ -18,19 +18,27 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" Margin="5">
-                        <TextBlock Text="Поиск:" Margin="0,0,10,0"/>
-                        <TextBox x:Name="SearchBox" Width="250" />
-                        <Button Content="Искать" Margin="5,0,0,0" Width="100" x:Name="btnSearch" Click="btnSearch_Click"/>
+                    <StackPanel Margin="5">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Width="100" Text="Поиск:" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SearchBox" Width="250" />
+                            <Button Content="Искать" Margin="5,0,0,0" Width="100" x:Name="btnSearch" Click="btnSearch_Click"/>
+                            <Button Content="Обновить" Margin="5,0,0,0" Width="100" x:Name="btnUpdate" Click="btnUpdate_Click"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Width="100" Text="Поиск по товару:" Margin="0,0,10,0"/>
+                            <TextBox x:Name="SearchBoxProduct" Width="250" />
+                            <Button Content="Искать" Margin="5,0,0,0" Width="100" x:Name="btnSearchProduct" Click="btnSearchProduct_Click"/>
+                        </StackPanel>
                     </StackPanel>
-                    <DataGrid x:Name="StoresDataGrid" Grid.Row="1" ColumnWidth="*" AutoGenerateColumns="False" CanUserAddRows="False" Margin="5">
+                    <DataGrid x:Name="StoresDataGrid" IsReadOnly="True" Grid.Row="1" ColumnWidth="*" AutoGenerateColumns="False" CanUserAddRows="False" Margin="5">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Название" Binding="{Binding Название}"/>
-                            <DataGridTextColumn Header="Адрес" Binding="{Binding Адрес}"/>
-                            <DataGridTextColumn Header="Телефоны" Binding="{Binding Телефоны}"/>
-                            <DataGridTextColumn Header="Специализация" Binding="{Binding Специализации.Описание}"/>
-                            <DataGridTextColumn Header="Форма собственности" Binding="{Binding ФормыСобственности.Описание}"/>
-                            <DataGridTextColumn Header="Время работы" Binding="{Binding ВремяРаботы}"/>
+                            <DataGridTextColumn Header="Название" Binding="{Binding Название}" />
+                            <DataGridTextColumn Header="Адрес" Binding="{Binding Адрес}" />
+                            <DataGridTextColumn Header="Телефоны" Binding="{Binding Телефоны}" />
+                            <DataGridTextColumn Header="Специализация" Binding="{Binding СпециализацияОписание}" />
+                            <DataGridTextColumn Header="Форма собственности" Binding="{Binding ФормаСобственностьОписание}" />
+                            <DataGridTextColumn Header="Время работы" Binding="{Binding ВремяРаботы}" />
                         </DataGrid.Columns>
                     </DataGrid>
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">

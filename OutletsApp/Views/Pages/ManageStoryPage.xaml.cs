@@ -2,7 +2,6 @@
 using OutletsApp.ViewModel;
 using System;
 using System.Data.Entity;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -14,14 +13,14 @@ namespace OutletsApp.Views.Pages
     /// </summary>
     public partial class ManageStoryPage : Page
     {
-        private Магазины _store { get; set; }
-        public ManageStoryPage(Магазины store)
+        private МагазинDTO _store { get; set; }
+
+        public ManageStoryPage(МагазинDTO store)
         {
             InitializeComponent();
             _store = store;
             this.DataContext = this;
             LoadFormData();
-
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -30,31 +29,43 @@ namespace OutletsApp.Views.Pages
             {
                 using (var db = new dbТорговыеТочкиEntities())
                 {
+                    Магазины storeEntity;
+
                     if (_store.МагазинID == 0)
                     {
-                        db.Магазины.Add(_store); // Для новых объектов
+                        // Создаем новую запись
+                        storeEntity = new Магазины();
+                        db.Магазины.Add(storeEntity);
                     }
                     else
                     {
-                        db.Магазины.Attach(_store); // Присоединяем, если объект был создан вне текущего контекста
-                        db.Entry(_store).State = EntityState.Modified; // Явно указываем, что объект изменился
+                        // Находим существующую запись
+                        storeEntity = db.Магазины.Find(_store.МагазинID);
+                        if (storeEntity == null)
+                        {
+                            MessageBox.Show("Не удалось найти запись для обновления.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
                     }
 
-                    if(txbName.Text == "" || txbAddress.Text == "" || txbPhoneNumber.Text == "" || txbTimeWorking.Text == "")
+                    // Проверка заполнения всех обязательных полей
+                    if (string.IsNullOrWhiteSpace(txbName.Text) ||
+                        string.IsNullOrWhiteSpace(txbAddress.Text) ||
+                        string.IsNullOrWhiteSpace(txbPhoneNumber.Text) ||
+                        string.IsNullOrWhiteSpace(txbTimeWorking.Text))
                     {
-                        MessageBox.Show("Заполните поля, все поля являются обязательными к заполнению!", "Пустые значения недопустимы!", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        MessageBox.Show("Заполните все поля, они являются обязательными!", "Пустые значения недопустимы!", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
 
-
                     // Обновляем данные из формы
-                    _store.Название = txbName.Text;
-                    _store.Адрес = txbAddress.Text;
-                    _store.Телефоны = txbPhoneNumber.Text;
+                    storeEntity.Название = txbName.Text;
+                    storeEntity.Адрес = txbAddress.Text;
+                    storeEntity.Телефоны = txbPhoneNumber.Text;
 
                     if (SpecializationComboBox.SelectedItem != null)
                     {
-                        _store.СпециализацияID = ((Специализации)SpecializationComboBox.SelectedItem).СпециализацияID;
+                        storeEntity.СпециализацияID = ((Специализации)SpecializationComboBox.SelectedItem).СпециализацияID;
                     }
                     else
                     {
@@ -64,7 +75,7 @@ namespace OutletsApp.Views.Pages
 
                     if (OwnershipComboBox.SelectedItem != null)
                     {
-                        _store.ФормаСобственностиID = ((ФормыСобственности)OwnershipComboBox.SelectedItem).ФормаСобственностиID;
+                        storeEntity.ФормаСобственностиID = ((ФормыСобственности)OwnershipComboBox.SelectedItem).ФормаСобственностиID;
                     }
                     else
                     {
@@ -72,7 +83,7 @@ namespace OutletsApp.Views.Pages
                         return;
                     }
 
-                    _store.ВремяРаботы = txbTimeWorking.Text;
+                    storeEntity.ВремяРаботы = txbTimeWorking.Text;
 
                     db.SaveChanges();
                 }
@@ -84,8 +95,6 @@ namespace OutletsApp.Views.Pages
             {
                 MessageBox.Show("Произошла системная ошибка: " + ex.Message, "Внимание, сбой!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-
         }
 
         private void LoadFormData()
@@ -115,7 +124,7 @@ namespace OutletsApp.Views.Pages
             NavigationService.GoBack();
         }
 
-        // Накладываем маску ввода номер телефона
+        // Накладываем маску ввода номера телефона
         private void txbPhoneNumber_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             if (!char.IsDigit(e.Text, e.Text.Length - 1))
@@ -152,10 +161,9 @@ namespace OutletsApp.Views.Pages
         private void TimeTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
         {
             // Разрешаем ввод только чисел и двоеточия
-            e.Handled = !char.IsDigit(e.Text, e.Text.Length - 1) && e.Text != ":";
+            e.Handled = !char.IsDigit(e.Text, e.Text.Length - 1) && e.Text != ":" && e.Text != e.Text;
         }
 
-       
         private void txbTimeWorking_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBox = sender as TextBox;
@@ -187,6 +195,10 @@ namespace OutletsApp.Views.Pages
 
             textBox.Text = newText;
             textBox.SelectionStart = cursorPosition > textBox.Text.Length ? textBox.Text.Length : cursorPosition;
+        }
+
+        private void txbTimeWorking_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
 
         }
     }
