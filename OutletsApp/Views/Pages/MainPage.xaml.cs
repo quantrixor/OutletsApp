@@ -259,12 +259,13 @@ namespace OutletsApp.Views.Pages
             {
                 using (var db = new dbТорговыеТочкиEntities())
                 {
+                    // Основной запрос для получения магазинов, содержащих указанный товар
                     var query = from n in db.Номенклатура
                                 join m in db.Магазины on n.МагазинID equals m.МагазинID
                                 join s in db.Специализации on m.СпециализацияID equals s.СпециализацияID
                                 join f in db.ФормыСобственности on m.ФормаСобственностиID equals f.ФормаСобственностиID
                                 where n.НаименованиеТовара.Contains(searchText)
-                                group m by new
+                                select new
                                 {
                                     m.МагазинID,
                                     m.Название,
@@ -273,19 +274,23 @@ namespace OutletsApp.Views.Pages
                                     m.ВремяРаботы,
                                     СпециализацияОписание = s.Описание,
                                     ФормаСобственностьОписание = f.Описание
-                                } into g
-                                select g.Key;
+                                };
 
-                    var result = query.AsEnumerable().Select(x => new МагазинDTO
-                    {
-                        МагазинID = x.МагазинID,
-                        Название = x.Название,
-                        Адрес = x.Адрес,
-                        Телефоны = x.Телефоны,
-                        ВремяРаботы = x.ВремяРаботы,
-                        СпециализацияОписание = x.СпециализацияОписание,
-                        ФормаСобственностьОписание = x.ФормаСобственностьОписание
-                    }).ToList();
+                    // Преобразуем запрос в список
+                    var result = query
+                                 .AsEnumerable()
+                                 .GroupBy(x => x.МагазинID) // Группируем по ID магазина
+                                 .Select(g => g.First()) // Берем первый элемент из каждой группы
+                                 .Select(x => new МагазинDTO
+                                 {
+                                     МагазинID = x.МагазинID,
+                                     Название = x.Название,
+                                     Адрес = x.Адрес,
+                                     Телефоны = x.Телефоны,
+                                     ВремяРаботы = x.ВремяРаботы,
+                                     СпециализацияОписание = x.СпециализацияОписание,
+                                     ФормаСобственностьОписание = x.ФормаСобственностьОписание
+                                 }).ToList();
 
                     return result;
                 }
@@ -296,7 +301,6 @@ namespace OutletsApp.Views.Pages
                 return new List<МагазинDTO>();
             }
         }
-
 
         // Обработчик для кнопки поиска по тексту
         private void btnSearch_Click(object sender, RoutedEventArgs e)
@@ -330,7 +334,7 @@ namespace OutletsApp.Views.Pages
         {
             try
             {
-                StoresDataGrid.ItemsSource = SearchStoresByProduct(SearchBox.Text);
+                StoresDataGrid.ItemsSource = SearchStoresByProduct(SearchBoxProduct.Text);
             }
             catch (Exception ex)
             {
