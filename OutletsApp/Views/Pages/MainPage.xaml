@@ -27,7 +27,7 @@
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <TextBlock Width="100" Text="Поиск по товару:" Margin="0,0,10,0"/>
-                            <TextBox x:Name="SearchBoxProduct" Width="250" />
+                            <TextBox x:Name="SearchBoxProduct" Width="250" TextChanged="SearchBoxProduct_TextChanged" />
                             <Button Content="Искать" Margin="5,0,0,0" Width="100" x:Name="btnSearchProduct" Click="btnSearchProduct_Click"/>
                         </StackPanel>
                     </StackPanel>

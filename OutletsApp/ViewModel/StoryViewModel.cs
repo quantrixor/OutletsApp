@@ -36,4 +36,5 @@ namespace OutletsApp.ViewModel
             }
         }
     }
+
 }

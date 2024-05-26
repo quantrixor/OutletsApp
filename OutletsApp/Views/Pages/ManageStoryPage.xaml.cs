@@ -2,6 +2,8 @@
 using OutletsApp.ViewModel;
 using System;
 using System.Data.Entity;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -18,83 +20,9 @@ namespace OutletsApp.Views.Pages
         public ManageStoryPage(МагазинDTO store)
         {
             InitializeComponent();
-            _store = store;
-            this.DataContext = this;
+            _store = store ?? throw new ArgumentNullException(nameof(store));
+            this.DataContext = _store;
             LoadFormData();
-        }
-
-        private void btnSave_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                using (var db = new dbТорговыеТочкиEntities())
-                {
-                    Магазины storeEntity;
-
-                    if (_store.МагазинID == 0)
-                    {
-                        // Создаем новую запись
-                        storeEntity = new Магазины();
-                        db.Магазины.Add(storeEntity);
-                    }
-                    else
-                    {
-                        // Находим существующую запись
-                        storeEntity = db.Магазины.Find(_store.МагазинID);
-                        if (storeEntity == null)
-                        {
-                            MessageBox.Show("Не удалось найти запись для обновления.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                            return;
-                        }
-                    }
-
-                    // Проверка заполнения всех обязательных полей
-                    if (string.IsNullOrWhiteSpace(txbName.Text) ||
-                        string.IsNullOrWhiteSpace(txbAddress.Text) ||
-                        string.IsNullOrWhiteSpace(txbPhoneNumber.Text) ||
-                        string.IsNullOrWhiteSpace(txbTimeWorking.Text))
-                    {
-                        MessageBox.Show("Заполните все поля, они являются обязательными!", "Пустые значения недопустимы!", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        return;
-                    }
-
-                    // Обновляем данные из формы
-                    storeEntity.Название = txbName.Text;
-                    storeEntity.Адрес = txbAddress.Text;
-                    storeEntity.Телефоны = txbPhoneNumber.Text;
-
-                    if (SpecializationComboBox.SelectedItem != null)
-                    {
-                        storeEntity.СпециализацияID = ((Специализации)SpecializationComboBox.SelectedItem).СпециализацияID;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Выберите специализацию из списка!", "Внимание! Недопустимое значение", MessageBoxButton.OK, MessageBoxImage.Information);
-                        return;
-                    }
-
-                    if (OwnershipComboBox.SelectedItem != null)
-                    {
-                        storeEntity.ФормаСобственностиID = ((ФормыСобственности)OwnershipComboBox.SelectedItem).ФормаСобственностиID;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Выберите форму собственности из списка!", "Внимание! Недопустимое значение", MessageBoxButton.OK, MessageBoxImage.Information);
-                        return;
-                    }
-
-                    storeEntity.ВремяРаботы = txbTimeWorking.Text;
-
-                    db.SaveChanges();
-                }
-
-                MessageBox.Show("Данные успешно сохранены!", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-                NavigationService.GoBack();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Произошла системная ошибка: " + ex.Message, "Внимание, сбой!", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
         }
 
         private void LoadFormData()
@@ -103,7 +31,7 @@ namespace OutletsApp.Views.Pages
             txbName.Text = _store.Название;
             txbAddress.Text = _store.Адрес;
             txbPhoneNumber.Text = _store.Телефоны;
-            txbTimeWorking.Text = _store.ВремяРаботы;
+            WorkTimeTextBox.Text = _store.ВремяРаботы;
 
             // Загрузка списков с callback для установки выбранных значений
             StoryViewModel.LoadSpecializations(SpecializationComboBox, () =>
@@ -119,9 +47,113 @@ namespace OutletsApp.Views.Pages
             });
         }
 
+
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                using (var db = new dbТорговыеТочкиEntities())
+                {
+                    Магазины storeEntity;
+
+                    if (_store.МагазинID == 0)
+                    {
+                        storeEntity = new Магазины();
+                        db.Магазины.Add(storeEntity);
+                    }
+                    else
+                    {
+                        storeEntity = db.Магазины.Find(_store.МагазинID);
+                        if (storeEntity == null)
+                        {
+                            MessageBox.Show("Не удалось найти запись для обновления.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                            return;
+                        }
+                    }
+
+                    if (string.IsNullOrWhiteSpace(txbName.Text) ||
+                        string.IsNullOrWhiteSpace(txbAddress.Text) ||
+                        string.IsNullOrWhiteSpace(txbPhoneNumber.Text) ||
+                        string.IsNullOrWhiteSpace(WorkTimeTextBox.Text))
+                    {
+                        MessageBox.Show("Заполните все поля, они являются обязательными!", "Пустые значения недопустимы!", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    var workTime = WorkTimeTextBox.Text;
+                    if (!IsValidTime(workTime))
+                    {
+                        MessageBox.Show("Время работы должно быть в формате 'с HH:MM по HH:MM' и быть в допустимом диапазоне!", "Неверный формат времени", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
+                    storeEntity.Название = txbName.Text;
+                    storeEntity.Адрес = txbAddress.Text;
+                    storeEntity.Телефоны = txbPhoneNumber.Text;
+                    storeEntity.ВремяРаботы = workTime;
+
+                    if (SpecializationComboBox.SelectedItem != null)
+                    {
+                        storeEntity.СпециализацияID = (int)SpecializationComboBox.SelectedValue;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Выберите специализацию из списка!", "Внимание! Недопустимое значение", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
+                    }
+
+                    if (OwnershipComboBox.SelectedItem != null)
+                    {
+                        storeEntity.ФормаСобственностиID = (int)OwnershipComboBox.SelectedValue;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Выберите форму собственности из списка!", "Внимание! Недопустимое значение", MessageBoxButton.OK, MessageBoxImage.Information);
+                        return;
+                    }
+
+                    db.SaveChanges();
+                }
+
+                MessageBox.Show("Данные успешно сохранены!", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                NavigationService.GoBack();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Произошла системная ошибка: " + ex.Message, "Внимание, сбой!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void btnBack_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.GoBack();
+        }
+
+        // Проверка вводимого времени на валидность
+        private bool IsValidTime(string time)
+        {
+            if (string.IsNullOrWhiteSpace(time)) return false;
+
+            // Регулярное выражение для проверки формата "с HH:MM по HH:MM"
+            var regex = new Regex(@"^с (?<startHour>\d{2}):(?<startMinute>\d{2}) по (?<endHour>\d{2}):(?<endMinute>\d{2})$");
+            var match = regex.Match(time);
+
+            if (!match.Success) return false;
+
+            int startHour = int.Parse(match.Groups["startHour"].Value);
+            int startMinute = int.Parse(match.Groups["startMinute"].Value);
+            int endHour = int.Parse(match.Groups["endHour"].Value);
+            int endMinute = int.Parse(match.Groups["endMinute"].Value);
+
+            // Проверка диапазонов
+            if (startHour < 0 || startHour > 23 || endHour < 0 || endHour > 23 ||
+                startMinute < 0 || startMinute > 59 || endMinute < 0 || endMinute > 59)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         // Накладываем маску ввода номера телефона
@@ -157,49 +189,6 @@ namespace OutletsApp.Views.Pages
                 e.Handled = true;
             }
         }
-
-        private void TimeTextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
-        {
-            // Разрешаем ввод только чисел и двоеточия
-            e.Handled = !char.IsDigit(e.Text, e.Text.Length - 1) && e.Text != ":" && e.Text != e.Text;
-        }
-
-        private void txbTimeWorking_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            TextBox textBox = sender as TextBox;
-            if (textBox == null) return;
-
-            int cursorPosition = textBox.SelectionStart;
-            string text = textBox.Text;
-            string newText = string.Empty;
-
-            foreach (char c in text)
-            {
-                // Принимаем только цифры и двоеточия
-                if (char.IsDigit(c) || c == ':' && !newText.Contains(":"))
-                {
-                    newText += c;
-                }
-            }
-
-            // Разбиение и проверка корректности времени
-            string[] parts = newText.Split(':');
-            if (parts.Length == 2)
-            {
-                if (int.TryParse(parts[0], out int hours) && hours > 23)
-                    parts[0] = "23"; // Корректировка часов
-                if (int.TryParse(parts[1], out int minutes) && minutes > 59)
-                    parts[1] = "59"; // Корректировка минут
-                newText = parts[0] + ":" + parts[1];
-            }
-
-            textBox.Text = newText;
-            textBox.SelectionStart = cursorPosition > textBox.Text.Length ? textBox.Text.Length : cursorPosition;
-        }
-
-        private void txbTimeWorking_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
-        {
-
-        }
     }
+
 }

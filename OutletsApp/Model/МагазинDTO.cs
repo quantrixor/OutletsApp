@@ -17,6 +17,8 @@ namespace OutletsApp.Model
         public int ФормаСобственностиID { get; set; }
         public string СпециализацияОписание { get; set; }
         public string ФормаСобственностьОписание { get; set; }
+        public Специализации SelectedSpecialization { get; set; }
+        public ФормыСобственности SelectedOwnership { get; set; }
     }
 
 

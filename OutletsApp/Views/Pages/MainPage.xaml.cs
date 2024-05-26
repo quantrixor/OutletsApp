@@ -126,7 +126,7 @@ namespace OutletsApp.Views.Pages
                 return;
             }
 
-            var selectedItem = StoresDataGrid.SelectedItem as Магазины;
+            var selectedItem = StoresDataGrid.SelectedItem as МагазинDTO;
             if (selectedItem == null)
             {
                 MessageBox.Show("Выберите магазин для удаления.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -137,11 +137,11 @@ namespace OutletsApp.Views.Pages
             {
                 using (var db = new dbТорговыеТочкиEntities())
                 {
-                    // Выбираем конкретный объект, который необходимо удалить из списка
+                    // Найдите реальный объект из базы данных по его ID
                     var itemToDelete = db.Магазины.Find(selectedItem.МагазинID);
                     if (itemToDelete != null)
                     {
-                        // Отправляем запрос на удаление данных
+                        // Удалите объект
                         db.Магазины.Remove(itemToDelete);
                         await db.SaveChangesAsync();
                         MessageBox.Show("Вы успешно удалили выбранную запись.", "Операция прошла успешно", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -264,7 +264,7 @@ namespace OutletsApp.Views.Pages
                                 join s in db.Специализации on m.СпециализацияID equals s.СпециализацияID
                                 join f in db.ФормыСобственности on m.ФормаСобственностиID equals f.ФормаСобственностиID
                                 where n.НаименованиеТовара.Contains(searchText)
-                                select new
+                                group m by new
                                 {
                                     m.МагазинID,
                                     m.Название,
@@ -273,7 +273,8 @@ namespace OutletsApp.Views.Pages
                                     m.ВремяРаботы,
                                     СпециализацияОписание = s.Описание,
                                     ФормаСобственностьОписание = f.Описание
-                                };
+                                } into g
+                                select g.Key;
 
                     var result = query.AsEnumerable().Select(x => new МагазинDTO
                     {
@@ -295,6 +296,7 @@ namespace OutletsApp.Views.Pages
                 return new List<МагазинDTO>();
             }
         }
+
 
         // Обработчик для кнопки поиска по тексту
         private void btnSearch_Click(object sender, RoutedEventArgs e)
@@ -334,6 +336,11 @@ namespace OutletsApp.Views.Pages
             {
                 MessageBox.Show("Произошла ошибка при выполнении поиска по товарам: " + ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void SearchBoxProduct_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
         }
     }
 }
